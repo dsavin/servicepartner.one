@@ -63,6 +63,20 @@ $ yarn test
 </code>
 
 
+<h3>Frontend</h3>
 
+Got to root folder. Run:
+
+<code>
+$ yarn
+</code>
+
+To install dependencies.
+
+After that you can start server by running:
+
+<code>
+yarn start
+</code>
 
 
