@@ -33,6 +33,10 @@ const getWorkForce = (room, senior, junior) => {
   }
 };
 
+const validation = (req) => {
+
+}
+
 /* GET status page. */
 router.get('/', function(req, res, next) {
   res.send(
@@ -45,6 +49,7 @@ router.get('/', function(req, res, next) {
 /* POST optimize page. */
 router.post('/optimize', function(req, res, next) {
   const body = req.body;
+  let response = [];
   // input data validation
   // validation: rooms property
   debug('validation started');
@@ -52,21 +57,23 @@ router.post('/optimize', function(req, res, next) {
     if (body.rooms.every((room) => typeof room === 'number') === false) {
       debug('validation failed for rooms');
       res.status(400);
-      res.json({'Validation Error': `At least one element of array in 'rooms' property is not a number`});
+      response.push({'Validation Error': `At least one element of array in 'rooms' property is not a number`});
     }
   } else {
     // missing rooms property
     debug('validation failed for rooms');
     res.status(400);
-    res.json({'Validation Error': `'rooms' property is missing or empty`});
+    response.push({'Validation Error': `'rooms' property is missing or empty`});
   }
+
+
 
   // validation: senior property
   if (body.hasOwnProperty('senior') === false
     || typeof body.senior !== 'number') {
     debug('validation failed for senior');
     res.status(400);
-    res.json({'Validation Error': `'senior' property is missing or not a number`});
+    response.push({'Validation Error': `'senior' property is missing or not a number`});
   }
 
   // validation: junior property
@@ -74,24 +81,25 @@ router.post('/optimize', function(req, res, next) {
     || typeof body.junior !== 'number') {
     debug('validation failed for junior');
     res.status(400);
-    res.json({'Validation Error': `'junior' property is missing or not a number`});
+    response.push({'Validation Error': `'junior' property is missing or not a number`});
   }
 
-  // everything is fine, we can proceed to business logic
-  // going through rooms
-  let response = [];
-  debug('loop through rooms array');
-  body.rooms.forEach((room) => {
-    if (room > body.senior) {
-      debug('calculate amount of seniors nd juniors');
-      response.push(getWorkForce(room, body.senior, body.junior));
-    } else {
-      debug('single senior is needed');
-      response.push({
-        "senior": 1
-      });
-    }
-  });
+  if (response.length === 0) {
+    // everything is fine, we can proceed to business logic
+    // going through rooms
+    debug('loop through rooms array');
+    body.rooms.forEach((room) => {
+      if (room > body.senior) {
+        debug('calculate amount of seniors nd juniors');
+        response.push(getWorkForce(room, body.senior, body.junior));
+      } else {
+        debug('single senior is needed');
+        response.push({
+          'senior': 1
+        });
+      }
+    });
+  }
 
   res.send(response);
 });

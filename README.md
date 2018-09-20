@@ -56,6 +56,12 @@ $ curl --request GET --url http://localhost:3000/api/
 $ curl --header "Content-Type: application/json" --request POST --data '{"rooms":[35, 21, 17],"senior":10, "junior": 6 }' http://localhost:3000/api/optimize
 </code>
 
+To run tests:
+
+<code>
+$ yarn test
+</code>
+
 
 
 
