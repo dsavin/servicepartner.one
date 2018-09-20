@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import axios from 'axios';
 
 class WorkForceForm extends React.Component {
   constructor() {
@@ -26,7 +27,21 @@ class WorkForceForm extends React.Component {
 
   handleSubmit = (evt) => {
     const { name, rooms } = this.state;
-    alert(`WorkForce Calculation: ${name} with ${rooms.length} rooms`);
+
+    const roomsToSend = rooms.map(room => room.value);
+
+    const payLoad = { rooms: roomsToSend }
+
+
+    axios.post('http://localhost:3000/api/optimize', payLoad)
+      .then(function(response){
+        console.log(response);
+        //Perform action based on response
+      })
+      .catch(function(error){
+        console.log(error);
+        //Perform action based on error
+      });
   }
 
   handleAddRoom = () => {
@@ -75,9 +90,8 @@ class App extends Component {
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">WorkForce Optimizator</h1>
         </header>
-        <p className="App-intro">
-          <WorkForceForm />
-        </p>
+        <WorkForceForm />
+
       </div>
     );
   }
