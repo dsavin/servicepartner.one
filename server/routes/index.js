@@ -2,15 +2,47 @@ const express = require('express');
 const router = express.Router();
 const debug = require('debug')('server:api');
 
-/* GET home page. */
+/* Work force calculation function */
+const getWorkForce = (room, senior, junior) => {
+
+  // remove single senior performance since there should be always one senior
+  const smallRoom = room - senior;
+
+  let seniorsAmount = 1 + Math.floor(smallRoom/senior);
+  let juniorAmount = Math.ceil((room - (senior * seniorsAmount)) / junior);
+
+  // check if we can optimize based on double juniors
+  if ((room - (seniorsAmount * senior)) < ((junior * 2) - senior)) {
+    seniorsAmount = seniorsAmount - 1;
+  }
+  const seniorOverlap = ((seniorsAmount + 1) * senior) - room;
+  const juniorOverlap = ((seniorsAmount * senior) + (juniorAmount * junior)) - room;
+
+  // check what will be better to add inthe ned
+  if (seniorOverlap < juniorOverlap) {
+    seniorsAmount = seniorsAmount + 1;
+  }
+
+  // final juniors calculation
+  juniorAmount = Math.ceil((room - (senior * seniorsAmount)) / junior);
+
+
+  return {
+    'senior': seniorsAmount,
+    'junior': juniorAmount
+  }
+};
+
+/* GET status page. */
 router.get('/', function(req, res, next) {
   res.send(
     {
-      healthCheck: "ok",
+      healthCheck: 'ok',
       uptime: `${process.uptime()} sec`
     });
 });
 
+/* POST optimize page. */
 router.post('/optimize', function(req, res, next) {
   const body = req.body;
   // input data validation
@@ -51,16 +83,17 @@ router.post('/optimize', function(req, res, next) {
   debug('loop through rooms array');
   body.rooms.forEach((room) => {
     if (room > body.senior) {
-
+      debug('calculate amount of seniors nd juniors');
+      response.push(getWorkForce(room, body.senior, body.junior));
     } else {
-      debug('singe senior is needed');
+      debug('single senior is needed');
       response.push({
         "senior": 1
       });
     }
   });
-  res.send(response);
 
+  res.send(response);
 });
 
 module.exports = router;
