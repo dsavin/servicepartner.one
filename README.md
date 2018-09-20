@@ -16,7 +16,7 @@ Install Node.js 10
 <br>
 <code>
 $ nvm install 10
-<br>
+
 $ nvm use 10
 </code>
 
